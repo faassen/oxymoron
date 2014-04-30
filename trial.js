@@ -3,7 +3,7 @@ var React = require('react');
 
 //var JSON = require('JSON');
 
-var r = acorn.parse('React.DOM.p({foo: "bar"}, "Hello world!")');
+var r = acorn.parse('React.DOM.p(null, "Hello world!")');
 
 //console.log(r);
 

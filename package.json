@@ -17,7 +17,7 @@
   "author": "Martijn Faassen",
   "license": "BSD",
   "dependencies": {
-    "acorn": "~0.5.1",
+    "acorn": "*",
     "domelementtype": "^1.1.1",
     "domhandler": "^2.2.0",
     "envify": "^1.2.1",
