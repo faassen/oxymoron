@@ -1,0 +1,30 @@
+{
+  "name": "oxymoron",
+  "version": "0.0.0",
+  "description": "React Templating Oxymoron",
+  "main": "oxymoron.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "mocha -u tdd"
+  },
+  "repository": "",
+  "keywords": [
+    "react",
+    "template"
+  ],
+  "author": "Martijn Faassen",
+  "license": "BSD",
+  "dependencies": {
+    "acorn": "~0.5.1",
+    "envify": "^1.2.1",
+    "escodegen": "^1.3.1-dev",
+    "htmlparser": "~2.0.0",
+    "react": "^0.10.0"
+  },
+  "devDependencies": {
+    "chai": "*",
+    "mocha": "*"
+  }
+}

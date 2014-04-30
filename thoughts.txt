@@ -1,0 +1,338 @@
+Parse HTML with node HTML parser.
+
+Acorn versus Esprima? Benchmark on representative examples.
+
+Look for special attributes, i.e. if, repeat, etc. The content should be
+a JS expression/variable assignment statement.
+
+if: expression repeat: in expression scope: variable assigments.
+match: (think about it more) we need a story for conditional
+attributes too. ternary impressions? or foo?="" attributes like in
+polymer?
+
+Also look in all normal attributes and text content for {{variable}}. These
+should contain JS expressions.
+
+There are a few special attributes like id and src we should have
+exceptions for.
+
+
+There can also be onFoo event bindings. This should also contain an expression
+that can be resolved to a function. (can this be checked? or is it
+any expression?)
+
+The i18n system is a preprocessor with some extra clever logic for pluralization.
+
+Algorithm could be:
+
+* parse HTML with HTML Parser.
+
+* then go through parsed HTML recursively, looking for reagent attributes
+  as well as attribute and text {{}}. Depth first.
+
+* any node that doesn't have any reagent stuff in it, nor does any reagent
+  stuff in its subnodes, is a plain React node. Assemble the plain
+  react nodes in it. I.e. React.DOM.p({}, 'Foo');
+
+* static sub-trees can be optimized into pre-created sub-trees stored
+  in a cache. They can be referred to multiple times  without problems,
+  as there are no variables in it. Resulting is an output op which
+  contains a reference to the cached node.
+
+* a node with reagent variables in it is a plain react node, but it
+  takes local variables mixed in. I.e. React.DOM.p({}, a);
+  React.DOM.p({}, ['the value is: ', a]); React.DOM.p({className: 'foo'}, []);
+  Resulting is an output operation which carries the React
+
+* check js code with esprima to see whether it makes sense in that
+  context. Also can be used to track variables.
+
+* a node with reagent attributes in it is translated to JS constructs.
+  An if is lifted above its node. A var creates a function that is
+  immediately called above its node.  A repeat creates a for loop
+  above its node. Once all reagent attributes are processed, the react node
+  can be constructed.
+
+* generate esprima expressions again with escodegen.
+
+
+{'op': 'if',
+ 'expression': 'foo',
+ 'if-branch': { 'op': 'output', value: React.DOM.p({}, []) }
+}
+
+<p if="foo">
+<p>
+
+lift out if:
+
+if (foo) {
+
+}
+
+now we have a plain react node:
+
+if (foo) {
+  result.push(React.DOM.p({}, []));
+}
+
+
+In case of an if, there is a result that contains the result or
+not. The result is then inserted into its higher up attribute.
+
+
+Example code:
+
+<ul>
+   <li repeat="item in list">
+      {{value}}
+   </li>
+</ul>
+
+translation
+
+function() {
+l = list.map(function(item) {
+   return value;
+});
+
+return DOM.ul({}, l);
+}
+
+watch binding effects inside of loops!
+
+<p var="x = 1, y = 2">
+  {{x}}
+</p>
+
+function() {
+  var x = 1, y =2;
+  return DOM.p({}, [x]);
+}
+
+<p if="foo">
+</p>
+<p if="!foo">
+</p>
+
+function() {
+   if (foo) {
+      return DOM.p({});
+   }
+   if (!foo) {
+      return DOM.p({});
+   }
+
+}
+
+or
+
+<p if="foo">
+</p>
+<p else>
+</p>
+
+or
+
+<p if="foo">
+</p>
+<p elif="bar">
+</p>
+<p else>
+</p>
+
+
+There is a concept of a template bundle. It can be embedded in the HTML
+page of the single page app:
+
+<script id="foo" type="reagent">
+</script>
+<script id="bar">
+</script>
+
+or alternatively it can be included in a special HTML file which only
+contains these that can be loaded using AJAX.
+
+We can compile a template bundle into a .js file. It can also be
+done on the fly on the client, loading the template functions.
+
+We can write:
+
+var template = reagent.pageTemplate();
+
+render: function() {
+   return template.foo(this);
+}
+
+to get template foo from the current HTML document.
+
+or we can write:
+
+var template = reagent.bundleTemplate('foo.html');
+
+to get templates from the foo.html bundle. The latter is useful when
+writing reuable code.
+
+There's something like Obviel's i18n story going on to get the
+templates relevant to the package.
+
+The reagent.pageTemplate or bundleTemplate functions do the following:
+
+* bundleTemplate: load relevant template bundle.
+
+* load each templates from the HTML document.
+
+* compile each template, generating functions (and cache).
+
+* put each template function into the resulting object.
+
+Project name:
+
+* reagent is already taken.
+
+* repartee?
+
+Shortcut prop and state top-level variables along with this?
+
+Binding
+
+A template can know all variables in actual use if certain restrictions
+are in place:
+
+* no function calls on this that take values from this directly.
+
+This means that we could use observable.js to track changes to state
+and automatically call setState when this happens.
+
+Operations:
+
+{
+  op: 'if',
+  expression: esprima-if-expression,
+  ifBlock: { op: ... },
+  elseBlock: null
+}
+
+{
+  op: 'for'
+  expression: esprima-loop-expression,
+  name: 'foo',
+  expression: esprima-expression,
+  block: {}
+}
+
+{
+  op: 'html',
+  value: cached_react_nodes
+}
+
+is an optimization of a lot of react nodes which have only node
+content.
+
+{
+  op: 'node'
+  nodeName: 'p',
+  attributes: { ... }
+  contents: [ ... ]
+}
+
+{
+  op: 'value',
+  expression: jsExpression
+}
+
+
+{
+  op: 'assignment',
+  expression: jsAssignment,
+  contents: [] // in scope of assignment
+}
+
+
+Reverse binding:
+
+<input type="text" value="" bind="props.dataContainer.foo">
+
+what this will do is call the foo method (to set foo) as soon as
+text has changed. there's also convert and validate:
+
+<input type="text" value="" bind=".." convert="convertFunc"
+  validate="validateFunc" error="errorFunc">
+
+convert tries to convert the input value to another type. It may fail
+with a conversion exception. validate can be used to place an additional
+check on the value, and may fail with a validation exception. if
+these exceptions occur, errorFunc will be called with the exception
+objects (which contain the details). Perhaps all this logic should
+be in dataContainer that's bound though.
+
+
+how would obviel's notion of render options work with propagating
+data through props? i.e.
+
+<render model="foo">
+
+where the component found has a certain contract concerning props? The
+contract will be fulfilled by foo as the component looked up will
+expect those props. Therefore an update function could also be propagated
+into the system, as long as that update function already refers
+to a component higher in the list, or even outside such as with Om.
+
+
+Om thoughts
+-----------
+
+How does Om do its fast has data changed checking based on references?
+Apparently the underlying data model keeps a reference in place and
+does not change directly, i.e. immutable data. Each change generates a
+new version of the data model.
+
+so when a user interacts with the UI, new versions of the data model
+are created. mori is a js library that can do this.
+
+Is there some kind of stateless data store that feels like a stateful
+one? Could we build one with Mori?
+
+root.foo.bar = "baz";
+root.foo.x = "something";
+[buffers all writes]
+root.foo.x -> still previous value
+
+root = root.write()
+[now the writes are available for reading]
+root.foo.bar
+root.foo.x
+
+can compare previous version with last to have a diff. then configure
+how to send the right diff to the server.
+
+we'd have:
+
+object (mori assoc)
+vector (mori vector). cannot completely replicate array API yet though.
+other mori structures can be thrown in if desired.
+
+now we can define our event handlers as doing an access to javascript
+objects, possibly auto-writing in the end if no manual write is done,
+and we get copy on write semantics. Then for each animation frame,
+re-render the whole thing.
+
+try writing todo mvc with react and mori and see what happens.
+
+
+investigate persistent data structures, copy on write.
+
+Func/call
+---------
+
+Func/call ability for internal reusable code? But can it be exported?
+Rather use components instead.
+
+<p func="foo(a, b, c)">
+
+</p>
+
+<div call="foo(a, b, c)">
+</div>
+
+
