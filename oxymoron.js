@@ -1,32 +1,78 @@
 /* */
 var htmlparser = require('htmlparser2');
+var domhandler = require('domhandler');
+var ElementType = require('domelementtype');
 var React = require('react');
 var dom = React.DOM;
 
-exports.compile = function(s) {
-    var topBuilt = [];
-    var stack = [{built: topBuilt}];
-
-    var parser = new htmlparser.Parser({
-        onopentag: function(name, attribs) {
-            stack.push({name: name, attribs: attribs, built: []});
-        },
-        ontext: function(text) {
-            stack[stack.length - 1].built.push(text);
-        },
-        onclosetag: function(tagname) {
-            var top = stack.pop();
-            var built = top.built;
-            if (built.length == 1) {
-                built = built[0];
-            }
-            stack[stack.length -1].built.push(
-                React.DOM[top.name](top.attribs, built));
-        }
-    });
+var parse = function(html) {
+    var handler = new domhandler.DomHandler();
+    var parser = new htmlparser.Parser(handler);
     parser.write(s);
     parser.end();
-    // topBuilt should be 1 entry
-    return topBuilt[0];
+    return handler.dom;
+};
+
+
+var attribExpr = function(attrib) {
+    if (attrib === null) {
+        return {
+            "type": "Literal",
+            "value": null,
+        };
+    }
+    return {
+        "type": "ObjectExpression",
+        "properties": [
+
+
+        ]
+    }
+};
+
+var domExpr = function(name, attrib, contents) {
+    return {
+        "expression": {
+            "type": "CallExpression",
+            "callee": {
+                "type": "MemberExpression",
+                "object": {
+                    "type": "MemberExpression",
+                    "object": {
+                        "type": "Identifier",
+                        "name": "React"
+                    },
+                    "property": {
+                        "type": "Identifier",
+                        "name": "DOM"
+                    },
+                    "computed": false
+                },
+                "property": {
+                    "type": "Identifier",
+                    "name": name
+                    },
+                "computed": false
+            },
+            "arguments": [
+                {
+                    "type": "Literal",
+                    "value": null,
+                },
+                {
+                    "type": "Literal",
+                    "value": "Hello world!",
+                    "raw": "\"Hello world!\""
+                }
+            ]
+        }
+    };
+};
+
+
+exports.compile = function(html) {
+    var dom = parse(html);
+}
+
 };
 

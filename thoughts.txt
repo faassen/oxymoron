@@ -37,7 +37,8 @@ Algorithm could be:
 * static sub-trees can be optimized into pre-created sub-trees stored
   in a cache. They can be referred to multiple times  without problems,
   as there are no variables in it. Resulting is an output op which
-  contains a reference to the cached node.
+  contains a reference to the cached node. XXXX maybe this isn't possible
+  because React might expect the node to be regenerated.
 
 * a node with reagent variables in it is a plain react node, but it
   takes local variables mixed in. I.e. React.DOM.p({}, a);
