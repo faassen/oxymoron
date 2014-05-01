@@ -59,6 +59,13 @@ var compileRepeatElement = function(repeatValue, ifValue, item) {
     // XXX validate that this is an identifier
     var itemExpr = repeatExpr.left;
     var iteratedExpr = repeatExpr.right;
+    if (ifValue !== undefined) {
+        var testExpr = parsejs.parseExpr(ifValue);
+        iteratedExpr = expr.createFunctionalExpr(
+            'filter',
+            iteratedExpr, itemExpr,
+            testExpr);
+    }
     return expr.createFunctionalExpr('map', iteratedExpr, itemExpr,
                                      compileSimpleElement(item));
 };
