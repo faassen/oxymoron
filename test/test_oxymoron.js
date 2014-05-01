@@ -32,18 +32,31 @@ suite("oyxmoron", function() {
         var expr = oxymoron.createContentsExpr("hello world");
         assert.equal(escodegen.generate(expr), "'hello world'");
     });
-    test("createContentsExpr array", function() {
-        var expr = oxymoron.createContentsExpr(["a", "b"]);
+    test("createContentsExpr empty", function() {
+        var expr = oxymoron.createContentsExpr('');
+        assert.equal(escodegen.generate(expr), "''");
+    });
+    test("createContentsExpr stache", function() {
+        var expr = oxymoron.createContentsExpr('Hello {{foo}}!');
         var expected = [
             "[",
-            "    'a',",
-            "    'b'",
+            "    'Hello ',",
+            "    foo,",
+            "    '!'",
             "]"].join('\n');
         assert.equal(escodegen.generate(expr), expected);
     });
-    test("createContentsExpr array empty", function() {
-        var expr = oxymoron.createContentsExpr([]);
-        assert.equal(escodegen.generate(expr), '[]');
+    test("createContentsExpr stache dotted", function() {
+        var expr = oxymoron.createContentsExpr('Hello {{foo.bar}}!');
+        var expected = [
+            "[",
+            "    'Hello ',",
+            "    foo.bar,",
+            "    '!'",
+            "]"].join('\n');
+        assert.equal(escodegen.generate(expr), expected);
     });
+
+
 
 });

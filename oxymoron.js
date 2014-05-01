@@ -78,12 +78,12 @@ exports.createAttribExpr = function(attrib) {
         }
         properties.push({
             "key": {
-                "type": "Identifier",
-                "name": key
+                type: "Identifier",
+                name: key
             },
             "value": {
-                "type": "Literal",
-                "value": attrib[key]
+                type: "Literal",
+                value: attrib[key],
             },
             "kind": "init"
         });
@@ -91,23 +91,28 @@ exports.createAttribExpr = function(attrib) {
     return result;
 };
 
-exports.createContentsExpr = function(contents) {
-    if (typeof contents === "string") {
-        return {
-            "type": "Literal",
-            "value": contents
-        };
-    }
-    var elements = contents.map(function(item) {
-        return {
-            "type": "Literal",
-            "value": item
+exports.createContentsExpr = function(s) {
+    var elements = stache.parse(s).map(function(item) {
+        if (item.type === 'text') {
+            return {
+                type: "Literal",
+                value: item.value
+            }
+        }
+        if (item.type === 'stache') {
+            return acorn.parse(item.value).body[0].expression;
         }
     });
+    // if there is only a single literal element, return it instead
+    if (elements.length === 1) {
+        if (elements[0].type === 'Literal') {
+            return elements[0];
+        }
+    }
     return {
-        "type": "ArrayExpression",
-        "elements": elements
-    };
+        type: "ArrayExpression",
+        elements: elements
+    }
 };
 
 exports.compile = function(html) {
