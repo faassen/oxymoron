@@ -1,3 +1,61 @@
+Obviel Template comparison:
+
+Variable interpolation: yes
+
+Dotted names in variables: yes, any js expression
+
+Current object: yes, through 'repeat' expression made explicit
+
+data-with: yes, let
+
+data-if: yes, if
+
+data-repeat: yes, repeat
+
+repeat variable: no, cannot access index to determine this. 
+
+nested scoping: yes
+
+render: no, but can be implemented using React component
+
+formatters: no
+
+event handler binding: no
+
+data-unwrap: do we want a special block element that disappears? but
+  what if it is the outer element? at least React DOM won't stop
+  such combination.
+
+data-el: dynamically generating elements. do we want this or do we
+  just rely on react -> rely on react.
+
+data-attr: same, just do it programmatically.
+
+data-call: rely on react
+
+special attributes: need to deal with class, on- functions,
+  camelcasing. if spelled the react way this will work though.
+
+data-trans, data-tvar, data-plural: need to implement something like this
+  in a preprocessor.
+
+Todo:
+
+* repeat with index.
+
+* event handler binding.
+
+* special block element.
+
+* handle special attributes such as 'class', className, etc.
+
+* data-trans, data-tvar, data-plural in preprocessor.
+
+* let with if, repeat
+
+
+
+
 Parse HTML with node HTML parser.
 
 Acorn versus Esprima? Benchmark on representative examples.
