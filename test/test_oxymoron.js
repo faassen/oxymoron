@@ -37,7 +37,7 @@ var cleanupParsedJs = function(parsed) {
     return parsed;
 };
 
-suite("oyxmoron", function() {
+suite("compilation", function() {
     test("compile", function() {
         assert.deepEqual(
             oxymoron.compile('<p>Hello world!</p>'),
@@ -69,5 +69,13 @@ suite("oyxmoron", function() {
             parseJsExpr('React.DOM.p({id: "Hello " + world + "!"}, "c")'));
     });
 
+});
 
+
+suite("function generation", function() {
+    test("func", function() {
+        var f = oxymoron.func(['React', 'name'], '<p>Hello {{name}}!</p>');
+        assert.deepEqual(f(React, "foo"),
+                         React.DOM.p(null, ["Hello ", "foo", "!"]));
+    });
 });

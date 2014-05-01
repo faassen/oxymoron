@@ -2,6 +2,7 @@ var htmlparser = require('htmlparser2');
 var DomHandler = require('domhandler');
 var ElementType = require('domelementtype');
 var React = require('react');
+var escodegen = require('escodegen');
 var expr = require('./expr');
 
 var dom = React.DOM;
@@ -53,8 +54,14 @@ var firstElementChild = function(children) {
     };
 };
 
-exports.compile = function(html) {
+exports.compile = compile = function(html) {
     var d = parse(html);
     return compileItem(firstElementChild(d))[0];
 };
 
+exports.func = function(args, html) {
+    return new Function(args, escodegen.generate({
+        type: "ReturnStatement",
+        argument: compile(html)
+    }));
+};
