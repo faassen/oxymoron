@@ -4,6 +4,8 @@ var domhandler = require('domhandler');
 var ElementType = require('domelementtype');
 var acorn = require('acorn');
 var React = require('react');
+var stache = require('./stache');
+
 var dom = React.DOM;
 
 var parse = function(html) {
