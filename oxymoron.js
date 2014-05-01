@@ -44,7 +44,7 @@ var compileElement = function(item) {
     delete item.attribs['let'];
 
     if (repeatValue !== undefined) {
-        return compileRepeatElement(repeatValue, item);
+        return compileRepeatElement(repeatValue, ifValue, item);
     }
 
     if (ifValue !== undefined) {
@@ -54,11 +54,17 @@ var compileElement = function(item) {
     return compileSimpleElement(item);
 };
 
-var compileRepeatElement = function(repeatValue, item) {
+var compileRepeatElement = function(repeatValue, ifValue, item) {
     var repeatExpr = parsejs.parseExpr(repeatValue);
     // XXX validate that this is an identifier
     var itemExpr = repeatExpr.left;
     var iteratedExpr = repeatExpr.right;
+    var compiledItem;
+    if (ifValue !== undefined) {
+        compiledItem = compileIfElement(ifValue, item);
+    } else {
+        compiledItem = compileSimpleElement(item);
+    }
     return {
         type: "CallExpression",
         callee: {
@@ -82,7 +88,7 @@ var compileRepeatElement = function(repeatValue, item) {
                     body: [
                         {
                             type: "ReturnStatement",
-                            argument: compileSimpleElement(item)
+                            argument: compiledItem
                         }
                     ]
                 }
