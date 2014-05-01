@@ -125,11 +125,48 @@ var createAddedExpr = function(elements) {
     };
 };
 
+var createFunctionalExpr = function(funcName,
+                                    iteratedExpr,
+                                    funcParameterExpr,
+                                    itemExpr) {
+    return {
+        type: "CallExpression",
+        callee: {
+            type: "MemberExpression",
+            object: iteratedExpr,
+            property: {
+                type: "Identifier",
+                name: funcName
+            },
+            computed: false
+        },
+        arguments: [
+            {
+                type: "FunctionExpression",
+                id: null,
+                params: [
+                    funcParameterExpr,
+                ],
+                body: {
+                    type: "BlockStatement",
+                    body: [
+                        {
+                            type: "ReturnStatement",
+                            argument: itemExpr
+                        }
+                    ]
+                }
+            }
+        ]
+    };
+};
+
 module.exports = {
     createComponentExpr: createComponentExpr,
     createElementExpr: createElementExpr,
     createReactDomExpr: createReactDomExpr,
     createAttribExpr: createAttribExpr,
     createTextExprArray: createTextExprArray,
-    createAttribValueExpr: createAttribValueExpr
+    createAttribValueExpr: createAttribValueExpr,
+    createFunctionalExpr: createFunctionalExpr
 };

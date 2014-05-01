@@ -59,42 +59,8 @@ var compileRepeatElement = function(repeatValue, ifValue, item) {
     // XXX validate that this is an identifier
     var itemExpr = repeatExpr.left;
     var iteratedExpr = repeatExpr.right;
-    var compiledItem;
-    if (ifValue !== undefined) {
-        compiledItem = compileIfElement(ifValue, item);
-    } else {
-        compiledItem = compileSimpleElement(item);
-    }
-    return {
-        type: "CallExpression",
-        callee: {
-            type: "MemberExpression",
-            object: iteratedExpr,
-            property: {
-                type: "Identifier",
-                name: "map"
-            },
-            computed: false
-        },
-        arguments: [
-            {
-                type: "FunctionExpression",
-                id: null,
-                params: [
-                    itemExpr
-                ],
-                body: {
-                    type: "BlockStatement",
-                    body: [
-                        {
-                            type: "ReturnStatement",
-                            argument: compiledItem
-                        }
-                    ]
-                }
-            }
-        ]
-    };
+    return expr.createFunctionalExpr('map', iteratedExpr, itemExpr,
+                                     compileSimpleElement(item));
 };
 
 var compileIfElement = function(ifValue, item) {

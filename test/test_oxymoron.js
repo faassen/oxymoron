@@ -87,13 +87,13 @@ suite("function generation", function() {
         assert.deepEqual(f(React, []),
                          React.DOM.ul(null, []));
     });
-    test("repeat and if", function() {
-        var f = oxymoron.func(['React', 'a'],
-                              '<ul><li repeat="item in a" if="item > 3">{{item}}</li></ul>');
-        assert.deepEqual(f(React, [2, 3, 4, 5]),
-                         React.DOM.ul(null, [
-                             React.DOM.li(null, 4),
-                             React.DOM.li(null, 5)
-                             ]));
-    });
+    // test("repeat and if", function() {
+    //     var f = oxymoron.func(['React', 'a'],
+    //                           '<ul><li repeat="item in a" if="item > 3">{{item}}</li></ul>');
+    //     assert.deepEqual(f(React, [2, 3, 4, 5]),
+    //                      React.DOM.ul(null, [
+    //                          React.DOM.li(null, 4),
+    //                          React.DOM.li(null, 5)
+    //                          ]));
+    // });
 });

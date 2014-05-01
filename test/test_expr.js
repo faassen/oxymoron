@@ -3,6 +3,7 @@
 var chai = require('chai');
 var acorn = require('acorn');
 var escodegen = require('escodegen');
+var parsejs = require('../parsejs');
 var expr = require('../expr');
 
 var assert = chai.assert;
@@ -93,6 +94,20 @@ suite("oyxmoron", function() {
             'p', {'className': 'foo'},
             expr.createTextExprArray("Hello!"));
         var expected = "React.DOM.p({ className: 'foo' }, 'Hello!')";
+        assert.equal(escodegen.generate(e), expected);
+    });
+    test("createFunctionalExpr", function() {
+        var repeatExpr = parsejs.parseExpr('item in list');
+        var e = expr.createFunctionalExpr(
+            'map',
+            repeatExpr.right,
+            repeatExpr.left,
+            expr.createComponentExpr(
+                'p', null, expr.createTextExprArray("Hello!")));
+        var expected = (
+            "list.map(function (item) {\n" +
+            "    return React.DOM.p(null, 'Hello!');\n" +
+            "})");
         assert.equal(escodegen.generate(e), expected);
     });
 
