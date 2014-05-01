@@ -44,46 +44,50 @@ var compileElement = function(item) {
     delete item.attribs['let'];
 
     if (repeatValue !== undefined) {
-        var repeatExpr = parsejs.parseExpr(repeatValue);
-        // XXX validate that this is an identifier
-        var itemExpr = repeatExpr.left;
-        var iteratedExpr = repeatExpr.right;
-        return {
-            type: "CallExpression",
-            callee: {
-                type: "MemberExpression",
-                object: iteratedExpr,
-                property: {
-                    type: "Identifier",
-                    name: "map"
-                },
-                computed: false
-            },
-            arguments: [
-                {
-                    type: "FunctionExpression",
-                    id: null,
-                    params: [
-                        itemExpr
-                    ],
-                    body: {
-                        type: "BlockStatement",
-                        body: [
-                            {
-                                type: "ReturnStatement",
-                                argument: compileSimpleElement(item)
-                            }
-                        ]
-                    }
-                }
-            ]
-        };
+        return compileRepeatElement(repeatValue, item);
     }
 
     if (ifValue !== undefined) {
         return compileIfElement(ifValue, item);
     }
     return compileSimpleElement(item);
+};
+
+var compileRepeatElement = function(repeatValue, item) {
+    var repeatExpr = parsejs.parseExpr(repeatValue);
+    // XXX validate that this is an identifier
+    var itemExpr = repeatExpr.left;
+    var iteratedExpr = repeatExpr.right;
+    return {
+        type: "CallExpression",
+        callee: {
+            type: "MemberExpression",
+            object: iteratedExpr,
+            property: {
+                type: "Identifier",
+                name: "map"
+            },
+            computed: false
+        },
+        arguments: [
+            {
+                type: "FunctionExpression",
+                id: null,
+                params: [
+                    itemExpr
+                ],
+                body: {
+                    type: "BlockStatement",
+                    body: [
+                        {
+                            type: "ReturnStatement",
+                            argument: compileSimpleElement(item)
+                        }
+                    ]
+                }
+            }
+        ]
+    };
 };
 
 var compileIfElement = function(ifValue, item) {
