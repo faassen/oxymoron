@@ -14,21 +14,46 @@ var parse = function(html) {
     return handler.dom;
 };
 
-var DOM_EXPR = acorn.parse('React.DOM.p(null, "text")').body[0].expression;
-
-var clone = function(obj) {
-    return JSON.parse(JSON.stringify(obj));
+exports.createComponentExpr = function(componentExpr,
+                                       attribExpr,
+                                       contentsExpr) {
+    return {
+        type: "ExpressionStatement",
+        expression: {
+            type: "CallExpression",
+            callee: componentExpr,
+            "arguments": [
+                attribExpr,
+                contentsExpr
+            ]
+        }
+    };
 };
 
-var domExpr = function(name, attrib, contents) {
-    var result = clone(DOM_EXPR);
-    result.callee.property.name = name;
-    result.arguments[0] = attribExpr(attrib);
-    result.arguments[1] = contentsExpr(contents);
-    return result;
+exports.createElementExpr = function(elementName) {
+    return {
+        type: "MemberExpression",
+        object: {
+            type: "MemberExpression",
+            object: {
+                type: "Identifier",
+                name: "React"
+            },
+            property: {
+                type: "Identifier",
+                name: "DOM"
+            },
+            computed: false
+        },
+        property: {
+            type: "Identifier",
+            name: elementName
+        },
+        computed: false
+    };
 };
 
-var attribExpr = function(attrib) {
+exports.createAttribExpr = function(attrib) {
     if (attrib === null) {
         return {
             "type": "Literal",
@@ -50,8 +75,8 @@ var attribExpr = function(attrib) {
                 "type": "Identifier",
                 "name": key
             },
-            "value" {
-                "type" "Literal",
+            "value": {
+                "type": "Literal",
                 "value": attrib[key]
             },
             "kind": "init"
@@ -60,13 +85,11 @@ var attribExpr = function(attrib) {
     return result;
 };
 
-var contentsExpr = function(contents) {
+exports.createContentsExpr = function(contents) {
 
 };
 
 exports.compile = function(html) {
     var dom = parse(html);
-}
-
 };
 
