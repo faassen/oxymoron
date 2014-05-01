@@ -35,9 +35,52 @@ var compileItem = function(item) {
 };
 
 var compileElement = function(item) {
+    var repeatValue = item.attribs['repeat'];
     var ifValue = item.attribs['if'];
+    var letValue = item.attribs['let'];
+
+    delete item.attribs['repeat'];
+    delete item.attribs['if'];
+    delete item.attribs['let'];
+
+    if (repeatValue !== undefined) {
+        var repeatExpr = parsejs.parseExpr(repeatValue);
+        // XXX validate that this is an identifier
+        var itemExpr = repeatExpr.left;
+        var iteratedExpr = repeatExpr.right;
+        return {
+            type: "CallExpression",
+            callee: {
+                type: "MemberExpression",
+                object: iteratedExpr,
+                property: {
+                    type: "Identifier",
+                    name: "map"
+                },
+                computed: false
+            },
+            arguments: [
+                {
+                    type: "FunctionExpression",
+                    id: null,
+                    params: [
+                        itemExpr
+                    ],
+                    body: {
+                        type: "BlockStatement",
+                        body: [
+                            {
+                                type: "ReturnStatement",
+                                argument: compileSimpleElement(item)
+                            }
+                        ]
+                    }
+                }
+            ]
+        };
+    }
+
     if (ifValue !== undefined) {
-        delete item.attribs['if'];
         var testExpr = parsejs.parseExpr(ifValue);
         return {
             type: "ConditionalExpression",

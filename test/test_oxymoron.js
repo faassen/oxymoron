@@ -71,4 +71,14 @@ suite("function generation", function() {
         assert.deepEqual(f(React, 2),
                          React.DOM.div(null, null));
     });
+    test("repeat", function() {
+        var f = oxymoron.func(['React', 'a'],
+                              '<ul><li repeat="item in a">{{item}}</li></ul>');
+        assert.deepEqual(f(React, [1, 2, 3, 4]),
+                         React.DOM.ul(null, [
+                             React.DOM.li(null, 1),
+                             React.DOM.li(null, 2),
+                             React.DOM.li(null, 3),
+                             React.DOM.li(null, 4)]));
+    });
 });
