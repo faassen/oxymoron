@@ -6,8 +6,6 @@ var parsejs = require('../parsejs');
 var oxymoron = require('../oxymoron');
 
 var assert = chai.assert;
-
-
 var parseExpr = parsejs.parseExpr;
 var cleanup = parsejs.cleanup;
 
