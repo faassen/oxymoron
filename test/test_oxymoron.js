@@ -81,4 +81,10 @@ suite("function generation", function() {
                              React.DOM.li(null, 3),
                              React.DOM.li(null, 4)]));
     });
+    test("repeat empty", function() {
+        var f = oxymoron.func(['React', 'a'],
+                              '<ul><li repeat="item in a">{{item}}</li></ul>');
+        assert.deepEqual(f(React, []),
+                         React.DOM.ul(null, []));
+    });
 });

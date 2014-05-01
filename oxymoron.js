@@ -50,6 +50,7 @@ var compileElement = function(item) {
     if (ifValue !== undefined) {
         return compileIfElement(ifValue, item);
     }
+
     return compileSimpleElement(item);
 };
 
