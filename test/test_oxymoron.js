@@ -28,4 +28,22 @@ suite("oyxmoron", function() {
         var expr = oxymoron.createAttribExpr({});
         assert.equal(escodegen.generate(expr), 'null');
     });
+    test("createContentsExpr one string", function() {
+        var expr = oxymoron.createContentsExpr("hello world");
+        assert.equal(escodegen.generate(expr), "'hello world'");
+    });
+    test("createContentsExpr array", function() {
+        var expr = oxymoron.createContentsExpr(["a", "b"]);
+        var expected = [
+            "[",
+            "    'a',",
+            "    'b'",
+            "]"].join('\n');
+        assert.equal(escodegen.generate(expr), expected);
+    });
+    test("createContentsExpr array empty", function() {
+        var expr = oxymoron.createContentsExpr([]);
+        assert.equal(escodegen.generate(expr), '[]');
+    });
+
 });

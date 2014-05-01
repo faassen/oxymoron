@@ -90,7 +90,22 @@ exports.createAttribExpr = function(attrib) {
 };
 
 exports.createContentsExpr = function(contents) {
-
+    if (typeof contents === "string") {
+        return {
+            "type": "Literal",
+            "value": contents
+        };
+    }
+    var elements = contents.map(function(item) {
+        return {
+            "type": "Literal",
+            "value": item
+        }
+    });
+    return {
+        "type": "ArrayExpression",
+        "elements": elements
+    };
 };
 
 exports.compile = function(html) {
