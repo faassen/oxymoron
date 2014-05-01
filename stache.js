@@ -3,15 +3,17 @@ var stacheOpen = new RegExp('\{\{\\s*');
 var stacheClose = new RegExp('\\s*\}\}');
 var curlyStacheClose = new RegExp('\\s*\}\}\}');
 
+exports.ParseError = ParseError = function(message) {
+    this.name = "ParseError";
+    this.message = message;
+};
+
 // scans until re, then eats the matching bit
 // returns the found text and the rest of the text after it.
 var scan = function(text, re) {
     var index = text.search(re);
     if (index === -1) {
-        return {
-            found: text,
-            rest: ""
-        };
+        return null;
     };
     var found = text.substring(0, index);
 
@@ -31,6 +33,13 @@ exports.parse = function(s) {
     var scanned = null;
     while (true) {
         scanned = scan(s, stacheOpen);
+        if (scanned === null) {
+            result.push({
+                type: "text",
+                value: s
+            });
+            break;
+        }
         if (scanned.found.length > 0) {
             result.push({
                 type: "text",
@@ -38,10 +47,22 @@ exports.parse = function(s) {
             });
         }
         s = scanned.rest;
-        if (s.length === 0) {
-            break;
+        scanned = scan(s, curlyStacheClose);
+        if (scanned !== null) {
+            result.push({
+                type: "stache",
+                value: scanned.found + '}'
+            });
+            s = scanned.rest;
+            if (s.length === 0) {
+                break;
+            }
+            continue;
         }
         scanned = scan(s, stacheClose);
+        if (scanned === null) {
+            throw new ParseError("Opening {{ but no closing }} found");
+        }
         result.push({
             type: "stache",
             value: scanned.found
