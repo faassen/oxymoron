@@ -1,4 +1,4 @@
-var acorn = require('acorn');
+var parsejs = require('./parsejs');
 var stache = require('./stache');
 
 exports.createComponentExpr = function(tag, attribs, children) {
@@ -23,7 +23,7 @@ var createContentsExpr = function(children) {
 };
 
 exports.createElementExpr = createElementExpr = function(s) {
-    var js = parseJsExpr(s);
+    var js = parsejs.parseExpr(s);
     // bare identifiers become React.DOM
     if (js.type === 'Identifier') {
         return createReactDomExpr(js.name);
@@ -87,9 +87,6 @@ exports.createAttribExpr = createAttribExpr = function(attrib) {
     return result;
 };
 
-var parseJsExpr = function(s) {
-    return acorn.parse(s).body[0].expression;
-};
 
 exports.createTextExprArray = createTextExprArray = function(s) {
     return stache.parse(s).map(function(item) {
@@ -100,7 +97,7 @@ exports.createTextExprArray = createTextExprArray = function(s) {
             }
         }
         if (item.type === 'stache') {
-            return parseJsExpr(item.value);
+            return parsejs.parseExpr(item.value);
         }
     });
 }

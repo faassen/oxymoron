@@ -36,6 +36,11 @@ var compileItem = function(item) {
 };
 
 var compileElement = function(item) {
+    var ifValue = item.attribs['if'];
+    if (ifValue !== undefined) {
+        delete item.attribs['if'];
+    }
+
     return expr.createComponentExpr(item.name,
                                     item.attribs || null,
                                     compileChildren(item.children));
