@@ -63,7 +63,7 @@ suite("function generation", function() {
                               '<div><p if="a > 3">Yes</p></div>');
         assert.deepEqual(f(React, 4),
                          React.DOM.div(null, React.DOM.p(null, "Yes")));
-    })
+    });
 
     test("if failure", function() {
         var f = oxymoron.func(['React', 'a'],

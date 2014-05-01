@@ -47,7 +47,7 @@ var compileElement = function(item) {
                 type: "Literal",
                 value: null
             }
-        }
+        };
     }
     return compileSimpleElement(item);
 };
