@@ -6,6 +6,7 @@ module.exports = function(grunt) {
             files: ['Gruntfile.js', '*.js', 'test/*.js'],
             options: {
                 node: true,
+                unused: true,
                 // options here to override JSHint defaults
                 globals: {
                     suite: true,

@@ -1,9 +1,7 @@
 "use strict";
 
 var chai = require('chai');
-var acorn = require('acorn');
 var React = require('react');
-var escodegen = require('escodegen');
 var parsejs = require('../parsejs');
 var oxymoron = require('../oxymoron');
 

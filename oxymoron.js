@@ -3,16 +3,12 @@
 var htmlparser = require('htmlparser2');
 var DomHandler = require('domhandler');
 var ElementType = require('domelementtype');
-var React = require('react');
 var escodegen = require('escodegen');
 var expr = require('./expr');
 
-var dom = React.DOM;
-
 var parse = function(html) {
-    var handler = new DomHandler(function(error) {
-        // XXX no error handling yet
-    });
+    // XXX no error handling yet
+    var handler = new DomHandler();
     var parser = new htmlparser.Parser(handler);
     parser.write(html);
     parser.end();
@@ -29,7 +25,7 @@ var compileChildren = function(children) {
 };
 
 var compileItem = function(item) {
-    if (item.type === 'tag') {
+    if (item.type === ElementType.Tag) {
         return [compileElement(item)];
     } else if (item.type === 'text') {
         return compileText(item);
