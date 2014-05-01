@@ -20,4 +20,12 @@ suite("oyxmoron", function() {
             "}"].join('\n');
         assert.equal(escodegen.generate(expr), expected);
     });
+    test("createAttribExpr null", function() {
+        var expr = oxymoron.createAttribExpr(null);
+        assert.equal(escodegen.generate(expr), 'null');
+    });
+    test("createAttribExpr empty dict", function() {
+        var expr = oxymoron.createAttribExpr({});
+        assert.equal(escodegen.generate(expr), 'null');
+    });
 });

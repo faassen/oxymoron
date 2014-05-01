@@ -53,8 +53,12 @@ exports.createElementExpr = function(elementName) {
     };
 };
 
+var isEmpty = function(obj) {
+    return Object.keys(obj).length === 0;
+};
+
 exports.createAttribExpr = function(attrib) {
-    if (attrib === null) {
+    if (attrib === null || isEmpty(attrib)) {
         return {
             "type": "Literal",
             "value": null
