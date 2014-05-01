@@ -5,6 +5,7 @@ var DomHandler = require('domhandler');
 var ElementType = require('domelementtype');
 var escodegen = require('escodegen');
 var expr = require('./expr');
+var parsejs = require('./parsejs');
 
 var parse = function(html) {
     // XXX no error handling yet
@@ -37,12 +38,26 @@ var compileElement = function(item) {
     var ifValue = item.attribs['if'];
     if (ifValue !== undefined) {
         delete item.attribs['if'];
+        var testExpr = parsejs.parseExpr(ifValue);
+        return {
+            type: "ConditionalExpression",
+            test: testExpr,
+            consequent: compileSimpleElement(item),
+            alternate: {
+                type: "Literal",
+                value: null
+            }
+        }
     }
+    return compileSimpleElement(item);
+};
 
+var compileSimpleElement = function(item) {
     return expr.createComponentExpr(item.name,
                                     item.attribs || null,
                                     compileChildren(item.children));
 };
+
 
 var compileText = function(item) {
     return expr.createTextExprArray(item.data);

@@ -43,6 +43,7 @@ suite("compilation", function() {
 
 });
 
+// XXX test for dealing with className, event handlers
 
 suite("function generation", function() {
     test("func", function() {
@@ -55,5 +56,19 @@ suite("function generation", function() {
         var f = oxymoron.func(['React', 'a', 'b'], '<p>Sum: {{a + b}}</p>');
         assert.deepEqual(f(React, 1, 2),
                          React.DOM.p(null, ["Sum: ", 3]));
+    });
+
+    test("if success", function() {
+        var f = oxymoron.func(['React', 'a'],
+                              '<div><p if="a > 3">Yes</p></div>');
+        assert.deepEqual(f(React, 4),
+                         React.DOM.div(null, React.DOM.p(null, "Yes")));
+    })
+
+    test("if failure", function() {
+        var f = oxymoron.func(['React', 'a'],
+                              '<div><p if="a > 3">Yes</p></div>');
+        assert.deepEqual(f(React, 2),
+                         React.DOM.div(null, null));
     });
 });
