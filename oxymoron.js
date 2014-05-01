@@ -81,18 +81,22 @@ var compileElement = function(item) {
     }
 
     if (ifValue !== undefined) {
-        var testExpr = parsejs.parseExpr(ifValue);
-        return {
-            type: "ConditionalExpression",
-            test: testExpr,
-            consequent: compileSimpleElement(item),
-            alternate: {
-                type: "Literal",
-                value: null
-            }
-        };
+        return compileIfElement(ifValue, item);
     }
     return compileSimpleElement(item);
+};
+
+var compileIfElement = function(ifValue, item) {
+    var testExpr = parsejs.parseExpr(ifValue);
+    return {
+        type: "ConditionalExpression",
+        test: testExpr,
+        consequent: compileSimpleElement(item),
+        alternate: {
+            type: "Literal",
+            value: null
+        }
+    };
 };
 
 var compileSimpleElement = function(item) {
