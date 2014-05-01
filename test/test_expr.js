@@ -12,7 +12,7 @@ suite("oyxmoron", function() {
     });
     test("createAttribExpr", function() {
         var e = expr.createAttribExpr({'foo': 'bar'});
-        var expected = "{ foo: 'bar' }"
+        var expected = "{ foo: 'bar' }";
         assert.equal(escodegen.generate(e), expected);
     });
     test("createAttribExpr with stache", function() {

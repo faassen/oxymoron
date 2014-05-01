@@ -22,9 +22,9 @@ exports.cleanup = cleanup = function(parsed) {
     if (typeof parsed !== 'object') {
         return;
     }
-    delete parsed['start'];
-    delete parsed['end'];
-    delete parsed['raw'];
+    delete parsed.start;
+    delete parsed.end;
+    delete parsed.raw;
     var key;
     for (key in parsed) {
         cleanup(parsed[key]);

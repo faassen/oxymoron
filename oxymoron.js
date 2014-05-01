@@ -56,7 +56,7 @@ var firstElementChild = function(children) {
         if (children[i].type === 'tag') {
             return children[i];
         }
-    };
+    }
 };
 
 exports.compile = compile = function(html) {
@@ -65,6 +65,7 @@ exports.compile = compile = function(html) {
 };
 
 exports.func = function(args, html) {
+    /* jshint evil: true */
     return new Function(args, escodegen.generate({
         type: "ReturnStatement",
         argument: compile(html)

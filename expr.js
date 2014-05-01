@@ -9,7 +9,7 @@ exports.createComponentExpr = function(tag, attribs, children) {
             createAttribExpr(attribs),
             createContentsExpr(children)
         ]
-    }
+    };
 };
 
 var createContentsExpr = function(children) {
@@ -19,7 +19,7 @@ var createContentsExpr = function(children) {
     return {
         type: "ArrayExpression",
         elements: children
-    }
+    };
 };
 
 exports.createElementExpr = createElementExpr = function(s) {
@@ -94,13 +94,13 @@ exports.createTextExprArray = createTextExprArray = function(s) {
             return {
                 type: "Literal",
                 value: item.value
-            }
+            };
         }
         if (item.type === 'stache') {
             return parsejs.parseExpr(item.value);
         }
     });
-}
+};
 
 exports.createAttribValueExpr = createAttribValueExpr = function(s) {
     var elements = createTextExprArray(s);
@@ -120,5 +120,5 @@ var createAddedExpr = function(elements) {
         left: createAddedExpr(elements),
         operator: "+",
         right: el
-    }
+    };
 };

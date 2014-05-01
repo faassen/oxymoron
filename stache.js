@@ -1,7 +1,7 @@
 
-var STACHE_OPEN_RE = new RegExp('\{\{\\s*');
-var STACHE_CLOSE_RE = new RegExp('\\s*\}\}');
-var CURLY_STACHE_CLOSE_RE = new RegExp('\\s*\}\}\}');
+var STACHE_OPEN_RE = /\{\{\s*/;
+var STACHE_CLOSE_RE = /\s*\}\}/;
+var CURLY_STACHE_CLOSE_RE = /\s*\}\}\}/;
 
 exports.ParseError = ParseError = function(message) {
     this.name = "ParseError";
@@ -14,7 +14,7 @@ var scan = function(text, re) {
     var index = text.search(re);
     if (index === -1) {
         return null;
-    };
+    }
     var found = text.substring(0, index);
 
     // eat the matching regex
@@ -25,7 +25,7 @@ var scan = function(text, re) {
     return {
         found: found,
         rest: rest
-    }
+    };
 };
 
 exports.parse = function(s) {
