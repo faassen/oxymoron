@@ -78,4 +78,10 @@ suite("function generation", function() {
         assert.deepEqual(f(React, "foo"),
                          React.DOM.p(null, ["Hello ", "foo", "!"]));
     });
+
+    test("func", function() {
+        var f = oxymoron.func(['React', 'a', 'b'], '<p>Sum: {{a + b}}</p>');
+        assert.deepEqual(f(React, 1, 2),
+                         React.DOM.p(null, ["Sum: ", 3]));
+    });
 });
