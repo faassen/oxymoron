@@ -110,5 +110,36 @@ suite("oyxmoron", function() {
             "})");
         assert.equal(escodegen.generate(e), expected);
     });
+    test("createVarExpr", function() {
+        var exprs = {
+            "a":  {
+                type: "Literal",
+                value: "Foo"
+            },
+            "b": {
+                type: "Literal",
+                value: 1
+            }
+        };
+        var e = expr.createVarExpr(exprs);
+        assert.equal(escodegen.generate(e), "var a = 'Foo', b = 1;");
+    });
+    test("createLetExpr", function() {
+        var exprs = {
+            "a":  {
+                type: "Literal",
+                value: "Foo"
+            }
+        };
 
+        var expected = [
+            "function () {",
+            "    var a = 'Foo';",
+            "    return a;",
+            "}()"].join('\n');
+
+        var e = expr.createLetExpr(exprs, {type: "Identifier", name: "a"});
+        assert.equal(escodegen.generate(e), expected);
+
+    });
 });

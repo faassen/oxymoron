@@ -51,6 +51,10 @@ var compileElement = function(item) {
         return compileIfElement(ifValue, item);
     }
 
+    if (letValue !== undefined) {
+        return compileLetElement(letValue, item);
+    }
+
     return compileSimpleElement(item);
 };
 
@@ -81,6 +85,18 @@ var compileIfElement = function(ifValue, item) {
             value: null
         }
     };
+};
+
+var compileLetElement = function(letValue, item) {
+    var letExpr = parsejs.parseExpr(letValue);
+    var exprs = {};
+    var i;
+    var e;
+    for (i = 0; i < letExpr.expressions.length; i++) {
+        e = letExpr.expressions[i];
+        exprs[e.left.name] = e.right;
+    }
+    return expr.createLetExpr(exprs, compileSimpleElement(item));
 };
 
 var compileSimpleElement = function(item) {

@@ -161,6 +161,49 @@ var createFunctionalExpr = function(funcName,
     };
 };
 
+var createVarExpr = function(variableExprs) {
+    var declarations = [];
+    var key;
+    for (key in variableExprs) {
+        declarations.push({
+            type: "VariableDeclarator",
+            id: {
+                type: "Identifier",
+                name: key
+            },
+            init: variableExprs[key]
+        });
+    }
+    return {
+        type: "VariableDeclaration",
+        declarations: declarations,
+        kind: "var"
+    };
+};
+
+var createLetExpr = function(variableExprs, expr) {
+    return {
+        type: "CallExpression",
+        callee: {
+            type: "FunctionExpression",
+            id: null,
+            params: [],
+            body: {
+                type: "BlockStatement",
+                body: [
+                    createVarExpr(variableExprs),
+                    {
+                        type: "ReturnStatement",
+                        argument: expr
+                    }
+
+                ]
+            }
+        },
+        arguments: []
+    };
+};
+
 module.exports = {
     createComponentExpr: createComponentExpr,
     createElementExpr: createElementExpr,
@@ -168,5 +211,7 @@ module.exports = {
     createAttribExpr: createAttribExpr,
     createTextExprArray: createTextExprArray,
     createAttribValueExpr: createAttribValueExpr,
-    createFunctionalExpr: createFunctionalExpr
+    createFunctionalExpr: createFunctionalExpr,
+    createVarExpr: createVarExpr,
+    createLetExpr: createLetExpr
 };
