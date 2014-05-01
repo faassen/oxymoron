@@ -3,7 +3,7 @@ var React = require('react');
 
 //var JSON = require('JSON');
 
-var r = acorn.parse('qux([Foo + Bar])');
+var r = acorn.parse('1 + 2 + 3 + 4');
 
 //console.log(r);
 

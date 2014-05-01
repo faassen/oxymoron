@@ -1,4 +1,5 @@
 var chai = require('chai');
+var acorn = require('acorn');
 var oxymoron = require('../oxymoron');
 var React = require('react');
 var escodegen = require('escodegen');
@@ -11,13 +12,13 @@ suite("oyxmoron", function() {
         assert.equal(escodegen.generate(expr), "React.DOM.p");
     });
     test("createAttribExpr", function() {
-        var expr = oxymoron.createAttribExpr({'foo': 'bar',
-                                              'qux': 1});
-        var expected = [
-            "{",
-            "    foo: 'bar',",
-            "    qux: 1",
-            "}"].join('\n');
+        var expr = oxymoron.createAttribExpr({'foo': 'bar'});
+        var expected = "{ foo: 'bar' }"
+        assert.equal(escodegen.generate(expr), expected);
+    });
+    test("createAttribExpr with stache", function() {
+        var expr = oxymoron.createAttribExpr({'foo': 'hello {{world}}!'});
+        var expected = "{ foo: 'hello ' + world + '!' }";
         assert.equal(escodegen.generate(expr), expected);
     });
     test("createAttribExpr null", function() {
@@ -56,7 +57,13 @@ suite("oyxmoron", function() {
             "]"].join('\n');
         assert.equal(escodegen.generate(expr), expected);
     });
-
-
-
+    test("createContentsExpr only stache", function() {
+        var expr = oxymoron.createContentsExpr("{{foo}}");
+        assert.equal(escodegen.generate(expr), "foo");
+    });
+    test("createContentsExpr stache error", function() {
+        assert.throws(function() {
+            oxymoron.createContentsExpr('Hello {{foo##bar}}!');
+        }, acorn.SyntaxError);
+    });
 });

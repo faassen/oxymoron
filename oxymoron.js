@@ -81,18 +81,16 @@ exports.createAttribExpr = function(attrib) {
                 type: "Identifier",
                 name: key
             },
-            "value": {
-                type: "Literal",
-                value: attrib[key],
-            },
+            "value": createAttribValueExpr(attrib[key]),
             "kind": "init"
         });
     }
     return result;
 };
 
-exports.createContentsExpr = function(s) {
-    var elements = stache.parse(s).map(function(item) {
+var exprArray = function(s) {
+    debugger;
+    return stache.parse(s).map(function(item) {
         if (item.type === 'text') {
             return {
                 type: "Literal",
@@ -103,15 +101,37 @@ exports.createContentsExpr = function(s) {
             return acorn.parse(item.value).body[0].expression;
         }
     });
-    // if there is only a single literal element, return it instead
+}
+
+exports.createContentsExpr = function(s) {
+    var elements = exprArray(s);
     if (elements.length === 1) {
-        if (elements[0].type === 'Literal') {
-            return elements[0];
-        }
+        return elements[0];
     }
     return {
         type: "ArrayExpression",
         elements: elements
+    }
+};
+
+exports.createAttribValueExpr = createAttribValueExpr = function(s) {
+    var elements = exprArray(s);
+    if (elements.length === 1) {
+        return elements[0];
+    }
+    return createAddedExpr(elements);
+};
+
+var createAddedExpr = function(elements) {
+    var el = elements.pop();
+    if (elements.length === 0) {
+        return el;
+    }
+    return {
+        type: "BinaryExpression",
+        left: createAddedExpr(elements),
+        operator: "+",
+        right: el
     }
 };
 
