@@ -56,6 +56,20 @@ Algorithm could be:
 
 * generate esprima expressions again with escodegen.
 
+if
+let
+repeat
+
+order of interpretation
+repeat if let
+
+If not dotted name, use React.DOM
+
+If dotted name, use that variable.
+
+<li repeat="foo in bar" if="foo == 3" let="value = foo.value">
+</li>
+
 
 {'op': 'if',
  'expression': 'foo',

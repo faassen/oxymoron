@@ -1,23 +1,37 @@
 var acorn = require('acorn');
 var stache = require('./stache');
 
-exports.createComponentExpr = function(componentExpr,
-                                       attribExpr,
-                                       contentsExpr) {
+exports.createComponentExpr = function(tag, attribs, children) {
     return {
-        type: "ExpressionStatement",
-        expression: {
-            type: "CallExpression",
-            callee: componentExpr,
-            "arguments": [
-                attribExpr,
-                contentsExpr
-            ]
-        }
-    };
+        type: "CallExpression",
+        callee: createElementExpr(tag),
+        "arguments": [
+            createAttribExpr(attribs),
+            createContentsExpr(children)
+        ]
+    }
 };
 
-exports.createElementExpr = function(elementName) {
+var createContentsExpr = function(children) {
+    if (children.length === 1) {
+        return children[0];
+    }
+    return {
+        type: "ArrayExpression",
+        elements: children
+    }
+};
+
+exports.createElementExpr = createElementExpr = function(s) {
+    var js = parseJsExpr(s);
+    // bare identifiers become React.DOM
+    if (js.type === 'Identifier') {
+        return createReactDomExpr(js.name);
+    }
+    return js;
+};
+
+exports.createReactDomExpr = createReactDomExpr = function(elementName) {
     return {
         type: "MemberExpression",
         object: {
@@ -44,7 +58,7 @@ var isEmpty = function(obj) {
     return Object.keys(obj).length === 0;
 };
 
-exports.createAttribExpr = function(attrib) {
+exports.createAttribExpr = createAttribExpr = function(attrib) {
     if (attrib === null || isEmpty(attrib)) {
         return {
             "type": "Literal",
@@ -73,8 +87,11 @@ exports.createAttribExpr = function(attrib) {
     return result;
 };
 
-var exprArray = function(s) {
-    debugger;
+var parseJsExpr = function(s) {
+    return acorn.parse(s).body[0].expression;
+};
+
+exports.createTextExprArray = createTextExprArray = function(s) {
     return stache.parse(s).map(function(item) {
         if (item.type === 'text') {
             return {
@@ -83,24 +100,13 @@ var exprArray = function(s) {
             }
         }
         if (item.type === 'stache') {
-            return acorn.parse(item.value).body[0].expression;
+            return parseJsExpr(item.value);
         }
     });
 }
 
-exports.createContentsExpr = function(s) {
-    var elements = exprArray(s);
-    if (elements.length === 1) {
-        return elements[0];
-    }
-    return {
-        type: "ArrayExpression",
-        elements: elements
-    }
-};
-
 exports.createAttribValueExpr = createAttribValueExpr = function(s) {
-    var elements = exprArray(s);
+    var elements = createTextExprArray(s);
     if (elements.length === 1) {
         return elements[0];
     }

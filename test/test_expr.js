@@ -28,41 +28,70 @@ suite("oyxmoron", function() {
         var e = expr.createAttribExpr({});
         assert.equal(escodegen.generate(e), 'null');
     });
-    test("createContentsExpr one string", function() {
-        var e = expr.createContentsExpr("hello world");
-        assert.equal(escodegen.generate(e), "'hello world'");
+    test("createTextExprArray one string", function() {
+        var e = expr.createTextExprArray("hello world");
+        assert.equal(e.length, 1);
+        assert.equal(escodegen.generate(e[0]), "'hello world'");
     });
-    test("createContentsExpr empty", function() {
-        var e = expr.createContentsExpr('');
-        assert.equal(escodegen.generate(e), "''");
+    test("createTextExprArray empty", function() {
+        var e = expr.createTextExprArray('');
+        assert.equal(e.length, 1);
+        assert.equal(escodegen.generate(e[0]), "''");
     });
-    test("createContentsExpr stache", function() {
-        var e = expr.createContentsExpr('Hello {{foo}}!');
-        var expected = [
-            "[",
-            "    'Hello ',",
-            "    foo,",
-            "    '!'",
-            "]"].join('\n');
-        assert.equal(escodegen.generate(e), expected);
+    test("createTextExprArray stache", function() {
+        var e = expr.createTextExprArray('Hello {{foo}}!');
+        assert.equal(e.length, 3);
+        assert.equal(escodegen.generate(e[0]), "'Hello '");
+        assert.equal(escodegen.generate(e[1]), "foo");
+        assert.equal(escodegen.generate(e[2]), "'!'");
     });
-    test("createContentsExpr stache dotted", function() {
-        var e = expr.createContentsExpr('Hello {{foo.bar}}!');
-        var expected = [
-            "[",
-            "    'Hello ',",
-            "    foo.bar,",
-            "    '!'",
-            "]"].join('\n');
-        assert.equal(escodegen.generate(e), expected);
+    test("createTextExprArray dotted", function() {
+        var e = expr.createTextExprArray('Hello {{foo.bar}}!');
+        assert.equal(e.length, 3);
+        assert.equal(escodegen.generate(e[0]), "'Hello '");
+        assert.equal(escodegen.generate(e[1]), "foo.bar");
+        assert.equal(escodegen.generate(e[2]), "'!'");
     });
-    test("createContentsExpr only stache", function() {
-        var e = expr.createContentsExpr("{{foo}}");
-        assert.equal(escodegen.generate(e), "foo");
+    test("createTextExprArray only stache", function() {
+        var e = expr.createTextExprArray("{{foo}}");
+        assert.equal(e.length, 1);
+        assert.equal(escodegen.generate(e[0]), "foo");
     });
-    test("createContentsExpr stache error", function() {
+    test("createTextExprArray stache error", function() {
         assert.throws(function() {
-            expr.createContentsExpr('Hello {{foo##bar}}!');
+            expr.createTextExprArray('Hello {{foo##bar}}!');
         }, acorn.SyntaxError);
     });
+    test('createElementExpr with HTML', function() {
+        var e = expr.createElementExpr('p');
+        assert.equal(escodegen.generate(e), 'React.DOM.p');
+    });
+    test('createElementExpr with dotted name', function() {
+        var e = expr.createElementExpr('foo.bar');
+        assert.equal(escodegen.generate(e), 'foo.bar');
+    });
+    test("createReactDomExpr", function() {
+        var e = expr.createReactDomExpr('p');
+        assert.equal(escodegen.generate(e), 'React.DOM.p');
+    });
+    test("createComponentExpr", function() {
+        var e = expr.createComponentExpr(
+            'p', {'className': 'foo'},
+            expr.createTextExprArray("Hello {{world}}!"));
+        var expected = [
+            "React.DOM.p({ className: 'foo' }, [",
+            "    'Hello ',",
+            "    world,",
+            "    '!'",
+            "])"].join('\n');
+        assert.equal(escodegen.generate(e), expected);
+    });
+    test("createComponentExpr single string", function() {
+        var e = expr.createComponentExpr(
+            'p', {'className': 'foo'},
+            expr.createTextExprArray("Hello!"));
+        var expected = "React.DOM.p({ className: 'foo' }, 'Hello!')";
+        assert.equal(escodegen.generate(e), expected);
+    });
+
 });

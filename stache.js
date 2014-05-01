@@ -1,7 +1,7 @@
 
-var stacheOpen = new RegExp('\{\{\\s*');
-var stacheClose = new RegExp('\\s*\}\}');
-var curlyStacheClose = new RegExp('\\s*\}\}\}');
+var STACHE_OPEN_RE = new RegExp('\{\{\\s*');
+var STACHE_CLOSE_RE = new RegExp('\\s*\}\}');
+var CURLY_STACHE_CLOSE_RE = new RegExp('\\s*\}\}\}');
 
 exports.ParseError = ParseError = function(message) {
     this.name = "ParseError";
@@ -32,7 +32,7 @@ exports.parse = function(s) {
     var result = [];
     var scanned = null;
     while (true) {
-        scanned = scan(s, stacheOpen);
+        scanned = scan(s, STACHE_OPEN_RE);
         if (scanned === null) {
             result.push({
                 type: "text",
@@ -47,7 +47,7 @@ exports.parse = function(s) {
             });
         }
         s = scanned.rest;
-        scanned = scan(s, curlyStacheClose);
+        scanned = scan(s, CURLY_STACHE_CLOSE_RE);
         if (scanned !== null) {
             result.push({
                 type: "stache",
@@ -59,7 +59,7 @@ exports.parse = function(s) {
             }
             continue;
         }
-        scanned = scan(s, stacheClose);
+        scanned = scan(s, STACHE_CLOSE_RE);
         if (scanned === null) {
             throw new ParseError("Opening {{ but no closing }} found");
         }
