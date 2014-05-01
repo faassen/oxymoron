@@ -1,7 +1,9 @@
+"use strict";
+
 var parsejs = require('./parsejs');
 var stache = require('./stache');
 
-exports.createComponentExpr = function(tag, attribs, children) {
+var createComponentExpr = function(tag, attribs, children) {
     return {
         type: "CallExpression",
         callee: createElementExpr(tag),
@@ -22,7 +24,7 @@ var createContentsExpr = function(children) {
     };
 };
 
-exports.createElementExpr = createElementExpr = function(s) {
+var createElementExpr = function(s) {
     var js = parsejs.parseExpr(s);
     // bare identifiers become React.DOM
     if (js.type === 'Identifier') {
@@ -31,7 +33,8 @@ exports.createElementExpr = createElementExpr = function(s) {
     return js;
 };
 
-exports.createReactDomExpr = createReactDomExpr = function(elementName) {
+
+var createReactDomExpr = function(elementName) {
     return {
         type: "MemberExpression",
         object: {
@@ -58,7 +61,7 @@ var isEmpty = function(obj) {
     return Object.keys(obj).length === 0;
 };
 
-exports.createAttribExpr = createAttribExpr = function(attrib) {
+var createAttribExpr = function(attrib) {
     if (attrib === null || isEmpty(attrib)) {
         return {
             "type": "Literal",
@@ -87,8 +90,7 @@ exports.createAttribExpr = createAttribExpr = function(attrib) {
     return result;
 };
 
-
-exports.createTextExprArray = createTextExprArray = function(s) {
+var createTextExprArray = function(s) {
     return stache.parse(s).map(function(item) {
         if (item.type === 'text') {
             return {
@@ -102,7 +104,7 @@ exports.createTextExprArray = createTextExprArray = function(s) {
     });
 };
 
-exports.createAttribValueExpr = createAttribValueExpr = function(s) {
+var createAttribValueExpr = function(s) {
     var elements = createTextExprArray(s);
     if (elements.length === 1) {
         return elements[0];
@@ -121,4 +123,13 @@ var createAddedExpr = function(elements) {
         operator: "+",
         right: el
     };
+};
+
+module.exports = {
+    createComponentExpr: createComponentExpr,
+    createElementExpr: createElementExpr,
+    createReactDomExpr: createReactDomExpr,
+    createAttribExpr: createAttribExpr,
+    createTextExprArray: createTextExprArray,
+    createAttribValueExpr: createAttribValueExpr
 };

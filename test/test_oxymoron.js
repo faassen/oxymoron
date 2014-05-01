@@ -1,3 +1,5 @@
+"use strict";
+
 var chai = require('chai');
 var acorn = require('acorn');
 var React = require('react');

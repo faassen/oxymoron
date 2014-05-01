@@ -1,3 +1,5 @@
+"use strict";
+
 var htmlparser = require('htmlparser2');
 var DomHandler = require('domhandler');
 var ElementType = require('domelementtype');
@@ -59,15 +61,20 @@ var firstElementChild = function(children) {
     }
 };
 
-exports.compile = compile = function(html) {
+var compile = function(html) {
     var d = parse(html);
     return compileItem(firstElementChild(d))[0];
 };
 
-exports.func = function(args, html) {
+var func = function(args, html) {
     /* jshint evil: true */
     return new Function(args, escodegen.generate({
         type: "ReturnStatement",
         argument: compile(html)
     }));
+};
+
+module.exports = {
+    compile: compile,
+    func: func
 };

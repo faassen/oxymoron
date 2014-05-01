@@ -1,6 +1,8 @@
+"use strict";
+
 var acorn = require('acorn');
 
-exports.parseExpr = function(s, clean) {
+var parseExpr = function(s, clean) {
     var result = acorn.parse(s).body[0].expression;
     if (clean) {
         cleanup(result);
@@ -8,7 +10,7 @@ exports.parseExpr = function(s, clean) {
     return result;
 };
 
-exports.cleanup = cleanup = function(parsed) {
+var cleanup = function(parsed) {
     if (parsed === null) {
         return;
     }
@@ -30,4 +32,9 @@ exports.cleanup = cleanup = function(parsed) {
         cleanup(parsed[key]);
     }
     return parsed;
+};
+
+module.exports = {
+    parseExpr: parseExpr,
+    cleanup: cleanup
 };

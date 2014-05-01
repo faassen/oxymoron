@@ -1,9 +1,10 @@
+"use strict";
 
 var STACHE_OPEN_RE = /\{\{\s*/;
 var STACHE_CLOSE_RE = /\s*\}\}/;
 var CURLY_STACHE_CLOSE_RE = /\s*\}\}\}/;
 
-exports.ParseError = ParseError = function(message) {
+var ParseError = function(message) {
     this.name = "ParseError";
     this.message = message;
 };
@@ -28,7 +29,7 @@ var scan = function(text, re) {
     };
 };
 
-exports.parse = function(s) {
+var parse = function(s) {
     var result = [];
     var scanned = null;
     while (true) {
@@ -75,3 +76,7 @@ exports.parse = function(s) {
     return result;
 };
 
+module.exports = {
+    ParseError: ParseError,
+    parse: parse
+};
