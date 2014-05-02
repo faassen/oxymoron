@@ -28,6 +28,7 @@
   "devDependencies": {
     "chai": "*",
     "grunt": "^0.4.4",
+    "grunt-closure-tools": "^0.9.6",
     "grunt-contrib-jshint": "^0.10.0",
     "mocha": "*"
   }
