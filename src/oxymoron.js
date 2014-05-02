@@ -35,11 +35,11 @@ var compileItem = function(item) {
 };
 
 var compileElement = function(item) {
-    var repeatValue = item.attribs['repeat'];
+    var repeatValue = item.attribs['repeat']; // jshint ignore:line
     var ifValue = item.attribs['if'];
     var letValue = item.attribs['let'];
 
-    delete item.attribs['repeat'];
+    delete item.attribs['repeat']; // jshint ignore:line
     delete item.attribs['if'];
     delete item.attribs['let'];
 

@@ -1,4 +1,4 @@
-var oxymoron = require('./oxymoron');
+var oxymoron = require('./src/oxymoron');
 var React = require('react');
 
 var helloHtml = '<h2>Hello {{value}}!</h2>';

@@ -2,8 +2,8 @@
 
 var chai = require('chai');
 var React = require('react');
-var parsejs = require('../parsejs');
-var oxymoron = require('../oxymoron');
+var parsejs = require('../src/parsejs');
+var oxymoron = require('../src/oxymoron');
 
 var assert = chai.assert;
 var parseExpr = parsejs.parseExpr;

@@ -3,8 +3,8 @@
 var chai = require('chai');
 var acorn = require('acorn');
 var escodegen = require('escodegen');
-var parsejs = require('../parsejs');
-var expr = require('../expr');
+var parsejs = require('../src/parsejs');
+var expr = require('../src/expr');
 
 var assert = chai.assert;
 

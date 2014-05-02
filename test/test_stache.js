@@ -1,7 +1,7 @@
 "use strict";
 
 var chai = require('chai');
-var stache = require('../stache');
+var stache = require('../src/stache');
 
 var assert = chai.assert;
 
