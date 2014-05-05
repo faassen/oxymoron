@@ -158,6 +158,16 @@ suite("function generation", function() {
                              ]));
     });
 
+    test("let does not affect outside", function() {
+        var f = oxymoron.func(['React', 'a'],
+                              '<div><div data-let="a = 2">{{a}}</div>{{a}}</div>');
+        assert.deepEqual(f(React, 1),
+                         React.DOM.div(null, [
+                             React.DOM.div(null, 2),
+                             1
+                         ]));
+    });
+
     // XXX this fails due to weird scoping rules
     // test("repeat and let shadow repeat name", function() {
     //     var f = oxymoron.func(['React', 'a'],
