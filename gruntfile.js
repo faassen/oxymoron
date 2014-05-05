@@ -23,7 +23,7 @@ module.exports = function(grunt) {
                     external: [
 //                       'acorn', 'domelementtype', 'domhandler',
 //                        'escodegen', 'htmlparser2',
-               //         'acorn',
+                        'escodegen',
                         'htmlparser2', // minify can't deal with this one
                         'react'
                     ]
