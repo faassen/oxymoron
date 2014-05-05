@@ -366,49 +366,6 @@ into the system, as long as that update function already refers
 to a component higher in the list, or even outside such as with Om.
 
 
-Om thoughts
------------
-
-How does Om do its fast has data changed checking based on references?
-Apparently the underlying data model keeps a reference in place and
-does not change directly, i.e. immutable data. Each change generates a
-new version of the data model.
-
-so when a user interacts with the UI, new versions of the data model
-are created. mori is a js library that can do this.
-
-Is there some kind of stateless data store that feels like a stateful
-one? Could we build one with Mori?
-
-root.foo.bar = "baz";
-root.foo.x = "something";
-[buffers all writes]
-root.foo.x -> still previous value
-
-root = root.write()
-[now the writes are available for reading]
-root.foo.bar
-root.foo.x
-
-can compare previous version with last to have a diff. then configure
-how to send the right diff to the server.
-
-we'd have:
-
-object (mori assoc)
-vector (mori vector). cannot completely replicate array API yet though.
-other mori structures can be thrown in if desired.
-
-now we can define our event handlers as doing an access to javascript
-objects, possibly auto-writing in the end if no manual write is done,
-and we get copy on write semantics. Then for each animation frame,
-re-render the whole thing.
-
-try writing todo mvc with react and mori and see what happens.
-
-
-investigate persistent data structures, copy on write.
-
 Func/call
 ---------
 
