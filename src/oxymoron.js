@@ -43,26 +43,33 @@ var compileElement = function(item) {
     delete item.attribs['data-if'];
     delete item.attribs['data-let'];
 
+    var elementExpr = compileElementCore(item);
+
     if (repeatValue !== undefined) {
-        return compileRepeatElement(repeatValue, ifValue, item);
+        return compileRepeatElement(repeatValue, ifValue, letValue,
+                                    elementExpr);
     }
 
     if (ifValue !== undefined) {
-        return compileIfElement(ifValue, letValue, item);
+        return compileIfElement(ifValue, letValue, elementExpr);
     }
 
     if (letValue !== undefined) {
-        return compileLetElement(letValue, item);
+        return compileLetElement(letValue, elementExpr);
     }
 
-    return compileSimpleElement(item);
+    return elementExpr;
 };
 
-var compileRepeatElement = function(repeatValue, ifValue, item) {
+var compileRepeatElement = function(repeatValue, ifValue, letValue,
+                                    elementExpr) {
     var repeatExpr = parsejs.parseExpr(repeatValue);
     // XXX validate that this is an identifier
     var itemExpr = repeatExpr.left;
     var iteratedExpr = repeatExpr.right;
+    if (letValue !== undefined) {
+        elementExpr = compileLetElement(letValue, elementExpr);
+    }
     if (ifValue !== undefined) {
         var testExpr = parsejs.parseExpr(ifValue);
         iteratedExpr = expr.createFunctionalExpr(
@@ -71,16 +78,16 @@ var compileRepeatElement = function(repeatValue, ifValue, item) {
             testExpr);
     }
     return expr.createFunctionalExpr('map', iteratedExpr, itemExpr,
-                                     compileSimpleElement(item));
+                                     elementExpr);
 };
 
-var compileIfElement = function(ifValue, letValue, item) {
+var compileIfElement = function(ifValue, letValue, elementExpr) {
     var testExpr = parsejs.parseExpr(ifValue);
     var consequentExpr;
     if (letValue !== undefined) {
-        consequentExpr = compileLetElement(letValue, item);
+        consequentExpr = compileLetElement(letValue, elementExpr);
     } else {
-        consequentExpr = compileSimpleElement(item);
+        consequentExpr = elementExpr;
     }
     return {
         type: "ConditionalExpression",
@@ -93,19 +100,24 @@ var compileIfElement = function(ifValue, letValue, item) {
     };
 };
 
-var compileLetElement = function(letValue, item) {
+var compileLetElement = function(letValue, elementExpr) {
     var letExpr = parsejs.parseExpr(letValue);
     var exprs = {};
     var i;
     var e;
-    for (i = 0; i < letExpr.expressions.length; i++) {
-        e = letExpr.expressions[i];
-        exprs[e.left.name] = e.right;
+    if (letExpr.type === 'SequenceExpression') {
+        for (i = 0; i < letExpr.expressions.length; i++) {
+            e = letExpr.expressions[i];
+            exprs[e.left.name] = e.right;
+        }
+    } else {
+        // AssignmentExpression
+        exprs[letExpr.left.name] = letExpr.right;
     }
-    return expr.createLetExpr(exprs, compileSimpleElement(item));
+    return expr.createLetExpr(exprs, elementExpr);
 };
 
-var compileSimpleElement = function(item) {
+var compileElementCore = function(item) {
     return expr.createComponentExpr(item.name,
                                     item.attribs || null,
                                     compileChildren(item.children));
@@ -126,19 +138,23 @@ var firstElementChild = function(children) {
 };
 
 var compile = function(html) {
-    var d = parse(html);
-    return compileItem(firstElementChild(d))[0];
+    return compileItem(firstElementChild(parse(html)))[0];
+};
+
+var funcBody = function(html) {
+    return escodegen.generate({
+        type: 'ReturnStatement',
+        argument: compile(html)
+    });
 };
 
 var func = function(args, html) {
     /* jshint evil: true */
-    return new Function(args, escodegen.generate({
-        type: "ReturnStatement",
-        argument: compile(html)
-    }));
+    return new Function(args, funcBody(html));
 };
 
 module.exports = {
     compile: compile,
+    funcBody: funcBody,
     func: func
 };

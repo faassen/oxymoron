@@ -59,8 +59,7 @@ suite("function generation", function() {
     });
 
     test("if success", function() {
-        var f = oxymoron.func(['React', 'a'],
-                              '<div><p data-if="a > 3">Yes</p></div>');
+        var f = oxymoron.func(['React', 'a'], '<div><p data-if="a > 3">Yes</p></div>');
         assert.deepEqual(f(React, 4),
                          React.DOM.div(null, React.DOM.p(null, "Yes")));
     });
@@ -87,6 +86,7 @@ suite("function generation", function() {
         assert.deepEqual(f(React, []),
                          React.DOM.ul(null, []));
     });
+
     test("repeat and if", function() {
         var f = oxymoron.func(['React', 'a'],
                               '<ul><li data-repeat="item in a" data-if="item > 3">{{item}}</li></ul>');
@@ -96,11 +96,28 @@ suite("function generation", function() {
                              React.DOM.li(null, 5)
                              ]));
     });
-    test("let", function() {
+
+
+    test("let with single expression", function() {
+        var f = oxymoron.func(['React'],
+                              '<div data-let="a = 3">{{a}}</div>');
+        assert.deepEqual(f(React),
+                         React.DOM.div(null, 3));
+    });
+
+    test("let with multiple expressions", function() {
         var f = oxymoron.func(['React'],
                               '<div data-let="a = 3, b = 2">{{a}} {{b}}</div>');
         assert.deepEqual(f(React),
                          React.DOM.div(null, [3, ' ', 2]));
+    });
+
+
+    test("let shadow name", function() {
+        var f = oxymoron.func(['React', 'a'],
+                              '<div data-let="a = 2">{{a}}</div>');
+        assert.deepEqual(f(React, 1),
+                         React.DOM.div(null, 2));
     });
 
     test("let with if", function() {
@@ -109,6 +126,50 @@ suite("function generation", function() {
         assert.deepEqual(f(React, [2, 3, 4, 5]),
                          React.DOM.div(null, [3, 2]));
     });
+
+    test("repeat and let", function() {
+        var f = oxymoron.func(['React', 'a'],
+                              '<ul><li data-repeat="item in a" data-let="m = item * item">{{m}}</li></ul>');
+        assert.deepEqual(f(React, [1, 2, 3]),
+                         React.DOM.ul(null, [
+                             React.DOM.li(null, 1),
+                             React.DOM.li(null, 4),
+                             React.DOM.li(null, 9)
+                             ]));
+    });
+
+    test("repeat and use iterable in iteration", function() {
+        var f = oxymoron.func(['React', 'a'],
+                              '<ul><li data-repeat="item in a">{{a[0]}}</li></ul>');
+        assert.deepEqual(f(React, [1, 2]),
+                         React.DOM.ul(null, [
+                             React.DOM.li(null, 1),
+                             React.DOM.li(null, 1)
+                         ]));
+    });
+
+    test("repeat and if and let", function() {
+        var f = oxymoron.func(['React', 'a'],
+                              '<ul><li data-repeat="item in a" data-if="item > 3" data-let="r = item * item">{{r}}</li></ul>');
+        assert.deepEqual(f(React, [2, 3, 4, 5]),
+                         React.DOM.ul(null, [
+                             React.DOM.li(null, 16),
+                             React.DOM.li(null, 25)
+                             ]));
+    });
+
+    // XXX this fails due to weird scoping rules
+    // test("repeat and let shadow repeat name", function() {
+    //     var f = oxymoron.func(['React', 'a'],
+    //                           '<ul><li data-repeat="item in a" data-let="item = item * item">{{item}}</li></ul>');
+    //     assert.deepEqual(f(React, [1, 2, 3]),
+    //                      React.DOM.ul(null, [
+    //                          React.DOM.li(null, 1),
+    //                          React.DOM.li(null, 4),
+    //                          React.DOM.li(null, 9)
+    //                          ]));
+    // });
+
 
 
 });
