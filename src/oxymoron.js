@@ -48,7 +48,7 @@ var compileElement = function(item) {
     }
 
     if (ifValue !== undefined) {
-        return compileIfElement(ifValue, item);
+        return compileIfElement(ifValue, letValue, item);
     }
 
     if (letValue !== undefined) {
@@ -74,12 +74,18 @@ var compileRepeatElement = function(repeatValue, ifValue, item) {
                                      compileSimpleElement(item));
 };
 
-var compileIfElement = function(ifValue, item) {
+var compileIfElement = function(ifValue, letValue, item) {
     var testExpr = parsejs.parseExpr(ifValue);
+    var consequentExpr;
+    if (letValue !== undefined) {
+        consequentExpr = compileLetElement(letValue, item);
+    } else {
+        consequentExpr = compileSimpleElement(item);
+    }
     return {
         type: "ConditionalExpression",
         test: testExpr,
-        consequent: compileSimpleElement(item),
+        consequent: consequentExpr,
         alternate: {
             type: "Literal",
             value: null

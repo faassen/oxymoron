@@ -103,12 +103,12 @@ suite("function generation", function() {
                          React.DOM.div(null, [3, ' ', 2]));
     });
 
-    // test("let with if", function() {
-    //     var f = oxymoron.func(['React', 'a'],
-    //                           '<div data-if="true" data-let="a = 3, b = 2">{{a}}{{b}}</div>');
-    //     assert.deepEqual(f(React, [2, 3, 4, 5]),
-    //                      React.DOM.div(null, [3, 2]));
-    // });
+    test("let with if", function() {
+        var f = oxymoron.func(['React', 'a'],
+                              '<div data-if="true" data-let="a = 3, b = 2">{{a}}{{b}}</div>');
+        assert.deepEqual(f(React, [2, 3, 4, 5]),
+                         React.DOM.div(null, [3, 2]));
+    });
 
 
 });
