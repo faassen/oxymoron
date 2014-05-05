@@ -60,20 +60,20 @@ suite("function generation", function() {
 
     test("if success", function() {
         var f = oxymoron.func(['React', 'a'],
-                              '<div><p if="a > 3">Yes</p></div>');
+                              '<div><p data-if="a > 3">Yes</p></div>');
         assert.deepEqual(f(React, 4),
                          React.DOM.div(null, React.DOM.p(null, "Yes")));
     });
 
     test("if failure", function() {
         var f = oxymoron.func(['React', 'a'],
-                              '<div><p if="a > 3">Yes</p></div>');
+                              '<div><p data-if="a > 3">Yes</p></div>');
         assert.deepEqual(f(React, 2),
                          React.DOM.div(null, null));
     });
     test("repeat", function() {
         var f = oxymoron.func(['React', 'a'],
-                              '<ul><li repeat="item in a">{{item}}</li></ul>');
+                              '<ul><li data-repeat="item in a">{{item}}</li></ul>');
         assert.deepEqual(f(React, [1, 2, 3, 4]),
                          React.DOM.ul(null, [
                              React.DOM.li(null, 1),
@@ -83,13 +83,13 @@ suite("function generation", function() {
     });
     test("repeat empty", function() {
         var f = oxymoron.func(['React', 'a'],
-                              '<ul><li repeat="item in a">{{item}}</li></ul>');
+                              '<ul><li data-repeat="item in a">{{item}}</li></ul>');
         assert.deepEqual(f(React, []),
                          React.DOM.ul(null, []));
     });
     test("repeat and if", function() {
         var f = oxymoron.func(['React', 'a'],
-                              '<ul><li repeat="item in a" if="item > 3">{{item}}</li></ul>');
+                              '<ul><li data-repeat="item in a" data-if="item > 3">{{item}}</li></ul>');
         assert.deepEqual(f(React, [2, 3, 4, 5]),
                          React.DOM.ul(null, [
                              React.DOM.li(null, 4),
@@ -97,17 +97,18 @@ suite("function generation", function() {
                              ]));
     });
     test("let", function() {
-        var f = oxymoron.func(['React', 'a'],
-                              '<div let="a = 3, b = 2">{{a}}{{b}}</div>');
-        assert.deepEqual(f(React, [2, 3, 4, 5]),
-                         React.DOM.div(null, [3, 2]));
+        var f = oxymoron.func(['React'],
+                              '<div data-let="a = 3, b = 2">{{a}} {{b}}</div>');
+        assert.deepEqual(f(React),
+                         React.DOM.div(null, [3, ' ', 2]));
     });
-    test("let with if", function() {
-        var f = oxymoron.func(['React', 'a'],
-                              '<div let="a = 3, b = 2">{{a}}{{b}}</div>');
-        assert.deepEqual(f(React, [2, 3, 4, 5]),
-                         React.DOM.div(null, [3, 2]));
-    });
+
+    // test("let with if", function() {
+    //     var f = oxymoron.func(['React', 'a'],
+    //                           '<div data-if="true" data-let="a = 3, b = 2">{{a}}{{b}}</div>');
+    //     assert.deepEqual(f(React, [2, 3, 4, 5]),
+    //                      React.DOM.div(null, [3, 2]));
+    // });
 
 
 });

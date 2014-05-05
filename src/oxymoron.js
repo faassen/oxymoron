@@ -35,13 +35,13 @@ var compileItem = function(item) {
 };
 
 var compileElement = function(item) {
-    var repeatValue = item.attribs['repeat']; // jshint ignore:line
-    var ifValue = item.attribs['if'];
-    var letValue = item.attribs['let'];
+    var repeatValue = item.attribs['data-repeat'];
+    var ifValue = item.attribs['data-if'];
+    var letValue = item.attribs['data-let'];
 
-    delete item.attribs['repeat']; // jshint ignore:line
-    delete item.attribs['if'];
-    delete item.attribs['let'];
+    delete item.attribs['data-repeat'];
+    delete item.attribs['data-if'];
+    delete item.attribs['data-let'];
 
     if (repeatValue !== undefined) {
         return compileRepeatElement(repeatValue, ifValue, item);
