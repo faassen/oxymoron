@@ -87,6 +87,17 @@ suite("function generation", function() {
                          React.DOM.ul(null, []));
     });
 
+    test("repeat with index", function() {
+        var f = oxymoron.func(['React', 'a'],
+                              '<ul><li data-repeat="(item, index) in a">{{index}}:{{item}}</li></ul>');
+        assert.deepEqual(f(React, [1, 2, 3, 4]),
+                         React.DOM.ul(null, [
+                             React.DOM.li(null, [0, ':', 1]),
+                             React.DOM.li(null, [1, ':', 2]),
+                             React.DOM.li(null, [2, ':', 3]),
+                             React.DOM.li(null, [3, ':', 4])]));
+    });
+
     test("repeat and if", function() {
         var f = oxymoron.func(['React', 'a'],
                               '<ul><li data-repeat="item in a" data-if="item > 3">{{item}}</li></ul>');
@@ -168,17 +179,16 @@ suite("function generation", function() {
                          ]));
     });
 
-    // XXX this fails due to weird scoping rules
-    // test("repeat and let shadow repeat name", function() {
-    //     var f = oxymoron.func(['React', 'a'],
-    //                           '<ul><li data-repeat="item in a" data-let="item = item * item">{{item}}</li></ul>');
-    //     assert.deepEqual(f(React, [1, 2, 3]),
-    //                      React.DOM.ul(null, [
-    //                          React.DOM.li(null, 1),
-    //                          React.DOM.li(null, 4),
-    //                          React.DOM.li(null, 9)
-    //                          ]));
-    // });
+    test("repeat and let shadow repeat name", function() {
+        var f = oxymoron.func(['React', 'a'],
+                              '<ul><li data-repeat="item in a" data-let="item = item * item">{{item}}</li></ul>');
+        assert.deepEqual(f(React, [1, 2, 3]),
+                         React.DOM.ul(null, [
+                             React.DOM.li(null, 1),
+                             React.DOM.li(null, 4),
+                             React.DOM.li(null, 9)
+                             ]));
+    });
 
 
 

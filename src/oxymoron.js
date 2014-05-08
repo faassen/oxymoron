@@ -66,6 +66,13 @@ var compileRepeatElement = function(repeatValue, ifValue, letValue,
     var repeatExpr = parsejs.parseExpr(repeatValue);
     // XXX validate that this is an identifier
     var itemExpr = repeatExpr.left;
+    var parameterExprs;
+    var indexExpr = null;
+    if (itemExpr.type === 'SequenceExpression') {
+        parameterExprs = itemExpr.expressions;
+    } else {
+        parameterExprs = [itemExpr];
+    }
     var iteratedExpr = repeatExpr.right;
     if (letValue !== undefined) {
         elementExpr = compileLetElement(letValue, elementExpr);
@@ -74,10 +81,10 @@ var compileRepeatElement = function(repeatValue, ifValue, letValue,
         var testExpr = parsejs.parseExpr(ifValue);
         iteratedExpr = expr.createFunctionalExpr(
             'filter',
-            iteratedExpr, itemExpr,
+            iteratedExpr, parameterExprs,
             testExpr);
     }
-    return expr.createFunctionalExpr('map', iteratedExpr, itemExpr,
+    return expr.createFunctionalExpr('map', iteratedExpr, parameterExprs,
                                      elementExpr);
 };
 

@@ -127,7 +127,7 @@ var createAddedExpr = function(elements) {
 
 var createFunctionalExpr = function(funcName,
                                     iteratedExpr,
-                                    funcParameterExpr,
+                                    funcParameterExprs,
                                     itemExpr) {
     return {
         type: "CallExpression",
@@ -144,9 +144,7 @@ var createFunctionalExpr = function(funcName,
             {
                 type: "FunctionExpression",
                 id: null,
-                params: [
-                    funcParameterExpr,
-                ],
+                params: funcParameterExprs,
                 body: {
                     type: "BlockStatement",
                     body: [
@@ -161,46 +159,36 @@ var createFunctionalExpr = function(funcName,
     };
 };
 
-var createVarExpr = function(variableExprs) {
-    var declarations = [];
-    var key;
-    for (key in variableExprs) {
-        declarations.push({
-            type: "VariableDeclarator",
-            id: {
-                type: "Identifier",
-                name: key
-            },
-            init: variableExprs[key]
-        });
-    }
-    return {
-        type: "VariableDeclaration",
-        declarations: declarations,
-        kind: "var"
-    };
-};
 
 var createLetExpr = function(variableExprs, expr) {
+    var params = [];
+    var args = [];
+    var key;
+    for (key in variableExprs) {
+        params.push({
+            type: "Identifier",
+            name: key
+        });
+        args.push(variableExprs[key]);
+    }
     return {
         type: "CallExpression",
         callee: {
             type: "FunctionExpression",
             id: null,
-            params: [],
+            params: params,
             body: {
                 type: "BlockStatement",
                 body: [
-                    createVarExpr(variableExprs),
                     {
                         type: "ReturnStatement",
                         argument: expr
-                    }
+                        }
 
                 ]
             }
         },
-        arguments: []
+        arguments: args
     };
 };
 
@@ -212,6 +200,5 @@ module.exports = {
     createTextExprArray: createTextExprArray,
     createAttribValueExpr: createAttribValueExpr,
     createFunctionalExpr: createFunctionalExpr,
-    createVarExpr: createVarExpr,
     createLetExpr: createLetExpr
 };

@@ -127,6 +127,16 @@ this is rendered like this::
     </li>
   </ul>
 
+If you need access to the repeat index, you can get it like this::
+
+  <ul>
+    <li data-repeat="(item, index) in [1, 2, 3]">
+     {{item}}
+    </li>
+  </ul>
+
+Note that the brackets around ``(item, index)`` are required!
+
 Combining directives
 --------------------
 

@@ -101,7 +101,7 @@ suite("oyxmoron", function() {
         var e = expr.createFunctionalExpr(
             'map',
             repeatExpr.right,
-            repeatExpr.left,
+            [repeatExpr.left],
             expr.createComponentExpr(
                 'p', null, expr.createTextExprArray("Hello!")));
         var expected = (
@@ -109,20 +109,6 @@ suite("oyxmoron", function() {
             "    return React.DOM.p(null, 'Hello!');\n" +
             "})");
         assert.equal(escodegen.generate(e), expected);
-    });
-    test("createVarExpr", function() {
-        var exprs = {
-            "a":  {
-                type: "Literal",
-                value: "Foo"
-            },
-            "b": {
-                type: "Literal",
-                value: 1
-            }
-        };
-        var e = expr.createVarExpr(exprs);
-        assert.equal(escodegen.generate(e), "var a = 'Foo', b = 1;");
     });
     test("createLetExpr", function() {
         var exprs = {
@@ -133,10 +119,9 @@ suite("oyxmoron", function() {
         };
 
         var expected = [
-            "function () {",
-            "    var a = 'Foo';",
+            "function (a) {",
             "    return a;",
-            "}()"].join('\n');
+            "}('Foo')"].join('\n');
 
         var e = expr.createLetExpr(exprs, {type: "Identifier", name: "a"});
         assert.equal(escodegen.generate(e), expected);
