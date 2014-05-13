@@ -122,6 +122,15 @@ suite("function generation", function() {
     });
 
 
+    test("repeat with index and if", function() {
+        var f = oxymoron.func(['React', 'a'],
+                              '<ul><li data-repeat="(item, index) in a" data-if="index > 1">{{index}}:{{item}}</li></ul>');
+        assert.deepEqual(f(React, [1, 2, 3, 4]),
+                         React.DOM.ul(null, [
+                             React.DOM.li(null, [0, ':', 3]),
+                             React.DOM.li(null, [1, ':', 4])]));
+    });
+
     // XXX repeat with index and if
 
     // XXX repeat and if and else

@@ -146,11 +146,11 @@ What happens if you add multiple directives to the same element?
 So::
 
   <ul>
-   <li data-repeat="item in [1, 2, 3, 4]"
-       data-if="item >= 3"
-       data-let="squared = item * item">
-     {{squared}}
-   </li>
+    <li data-repeat="item in [1, 2, 3, 4]"
+        data-if="item >= 3"
+        data-let="squared = item * item">
+      {{squared}}
+    </li>
   </ul>
 
 is rendered like this::
@@ -163,6 +163,30 @@ is rendered like this::
       16
     </li>
   </ul>
+
+There is a special rule concerning repeat indexes. If you use this::
+
+  <ul>
+    <li data-repeat="(item, index) in [1, 2, 3, 4]"
+        data-if="index >= 2">
+      {{index}} : {{value}}
+    </li>
+  </ul>
+
+then it is rendered like this::
+
+  <ul>
+    <li>
+      0: 3
+    </li>
+    <li>
+      1: 4
+    </li>
+  </ul>
+
+For ``data-if``, ``index`` refers to the index in the larger list. For
+``data-repeat``, ``index`` refers to the new index after filtering
+with ``data-if`` took place.
 
 i18n
 ----
