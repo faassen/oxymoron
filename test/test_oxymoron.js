@@ -70,6 +70,19 @@ suite("function generation", function() {
         assert.deepEqual(f(React, 2),
                          React.DOM.div(null, null));
     });
+
+    test("if success with else", function() {
+       var f = oxymoron.func(['React', 'a'], '<div><p data-if="a > 3">Yes</p><p data-else>No</p></div>');
+       assert.deepEqual(f(React, 4),
+                        React.DOM.div(null, React.DOM.p(null, "Yes")));
+    });
+
+    test("if failure with else", function() {
+        var f = oxymoron.func(['React', 'a'], '<div><p data-if="a > 3">Yes</p><p data-else>No</p></div>');
+        assert.deepEqual(f(React, 2),
+                         React.DOM.div(null, React.DOM.p(null, "No")));
+    });
+
     test("repeat", function() {
         var f = oxymoron.func(['React', 'a'],
                               '<ul><li data-repeat="item in a">{{item}}</li></ul>');
@@ -108,6 +121,10 @@ suite("function generation", function() {
                              ]));
     });
 
+
+    // XXX repeat with index and if
+
+    // XXX repeat and if and else
 
     test("let with single expression", function() {
         var f = oxymoron.func(['React'],

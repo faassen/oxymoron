@@ -19,22 +19,26 @@ var parse = function(html) {
 var compileChildren = function(children) {
     var result = [];
     var i;
-    for (i = 0; i < children.length; i++) {
-        Array.prototype.push.apply(result, compileItem(children[i]));
+    var compiled;
+    for (i = 0; i < children.length; i = compiled.index) {
+        compiled = compileItem(children, i);
+        Array.prototype.push.apply(result, compiled.result);
     }
     return result;
 };
 
-var compileItem = function(item) {
+var compileItem = function(children, index) {
+    var item = children[index];
     if (item.type === ElementType.Tag) {
-        return [compileElement(item)];
+        return compileElement(children, index);
     } else if (item.type === 'text') {
-        return compileText(item);
+        return {result: compileText(item), index: index + 1};
     }
     return null;
 };
 
-var compileElement = function(item) {
+var compileElement = function(children, index) {
+    var item = children[index];
     var repeatValue = item.attribs['data-repeat'];
     var ifValue = item.attribs['data-if'];
     var letValue = item.attribs['data-let'];
@@ -45,20 +49,38 @@ var compileElement = function(item) {
 
     var elementExpr = compileElementCore(item);
 
+    var elseIndex = nextElementIndex(children, index + 1);
+    var elseItem = null;
+    var elseElementExpr = null;
+    var elseValue;
+    if (elseIndex !== null) {
+        elseItem = children[elseIndex];
+        elseValue = elseItem.attribs['data-else'] !== undefined;
+        delete elseItem.attribs['data-else'];
+        if (elseValue) {
+            elseElementExpr = compileElementCore(elseItem);
+            index = elseIndex;
+        }
+    }
+
     if (repeatValue !== undefined) {
-        return compileRepeatElement(repeatValue, ifValue, letValue,
-                                    elementExpr);
+        return {result: [compileRepeatElement(repeatValue, ifValue, letValue,
+                                              elementExpr)],
+                index: index + 1};
     }
 
     if (ifValue !== undefined) {
-        return compileIfElement(ifValue, letValue, elementExpr);
+        return {result: [compileIfElement(ifValue, elseValue, letValue,
+                                          elementExpr, elseElementExpr)],
+                index: index + 1};
     }
 
     if (letValue !== undefined) {
-        return compileLetElement(letValue, elementExpr);
+        return {result: [compileLetElement(letValue, elementExpr)],
+                index: index + 1};
     }
 
-    return elementExpr;
+    return {result: [elementExpr], index: index + 1};
 };
 
 var compileRepeatElement = function(repeatValue, ifValue, letValue,
@@ -88,22 +110,28 @@ var compileRepeatElement = function(repeatValue, ifValue, letValue,
                                      elementExpr);
 };
 
-var compileIfElement = function(ifValue, letValue, elementExpr) {
+var compileIfElement = function(ifValue, elseValue, letValue,
+                                elementExpr, elseElementExpr) {
     var testExpr = parsejs.parseExpr(ifValue);
-    var consequentExpr;
+    var consequentExpr, alternateExpr;
     if (letValue !== undefined) {
         consequentExpr = compileLetElement(letValue, elementExpr);
     } else {
         consequentExpr = elementExpr;
     }
+    if (elseValue) {
+        alternateExpr = elseElementExpr;
+    } else {
+        alternateExpr = {
+            type: "Literal",
+            value: null
+        }
+    }
     return {
         type: "ConditionalExpression",
         test: testExpr,
         consequent: consequentExpr,
-        alternate: {
-            type: "Literal",
-            value: null
-        }
+        alternate: alternateExpr
     };
 };
 
@@ -135,17 +163,22 @@ var compileText = function(item) {
     return expr.createTextExprArray(item.data);
 };
 
-var firstElementChild = function(children) {
-    var i;
-    for (i = 0; i < children.length; i++) {
-        if (children[i].type === 'tag') {
-            return children[i];
+var nextElementIndex = function(children, index) {
+    for (; index < children.length; index++) {
+        if (children[index].type === ElementType.Tag) {
+            return index;
         }
     }
+    return null;
+};
+
+var firstElementIndex = function(children) {
+    return nextElementIndex(children, 0);
 };
 
 var compile = function(html) {
-    return compileItem(firstElementChild(parse(html)))[0];
+    var children = parse(html);
+    return compileItem(children, firstElementIndex(children)).result[0];
 };
 
 var funcBody = function(html) {
