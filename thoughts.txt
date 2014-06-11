@@ -380,3 +380,76 @@ Rather use components instead.
 </div>
 
 
+Script/Template tag
+===================
+
+Polymer inspired definition of elements:
+
+<react-element name="Person">
+  <template>
+    <span>{{this.props.person.id}} works at {{this.props.person.address}}</span>
+  </template>
+</react-element>
+
+<react-element name="Persons">
+ <template>
+    <ul>
+        <li data-repeat="person in this.props.persons" key="{{person.id}}">
+           <Person person="{{person}}" />
+        </li>
+    </ul>
+ </template>
+</react-element>
+
+<react-element name="App">
+  <template>
+    <div>
+      <Persons persons="{{this.state.persons}}" />
+      <button onClick="{{this.handlePrev}}">prev</button>
+      <button onClick="{{this.handleNext}}">next</button>
+    </div>
+  </template>
+
+  <script>
+     oxymoron.element({
+        getInitialState: function() {
+           return {
+             persons: [],
+             next: null,
+             prev: null
+           };
+        },
+       componentDidMount: function() {
+           this.update(this.props.source);
+       }
+       update: function(source) {
+           $.get(source, function(result) {
+              this.setState(result);
+           }.bind(this));
+       },
+       handleNext: function() {
+          this.update(this.state.next);
+       },
+       handlePrev: function() {
+          this.update(this.state.prev);
+       }
+     });
+  </script>
+</react-element>
+
+Questions/points:
+
+* should data- stuff also use double stache? Or at least allow them?
+
+* the compiler should refuse to compile template without a top element
+  in it.
+
+* how do elements get namedspaced?
+
+* how does oxymoron.element get associated with tagname? Is there
+  a way to pass it explicitly? Perhaps pass element name into
+  ``oxymoron.element()`` or something.
+
+* how do we handle dashes in variable names? How does React deal with this?
+
+* the script stuff can also be placed in another file (like in Polymer).
