@@ -1,4 +1,4 @@
-Oyxmoron Templates for React
+Oxymoron Templates for React
 ============================
 
 The React client side framework doesn't have a template
@@ -16,8 +16,8 @@ Example
 
 ::
 
-  <ul let="a = ['hello', 'React', '!']">
-    <li repeat="item in a">{{item}}</li>
+  <ul data-let="a = ['hello', 'React', '!']">
+    <li data-repeat="item in a">{{item}}</li>
   </ul>
 
 is rendered as this::
